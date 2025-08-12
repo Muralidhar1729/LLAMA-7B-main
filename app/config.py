@@ -5,7 +5,7 @@ load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_API_BASE = os.getenv("OPENAI_API_BASE", "http://localhost:8000/v1")
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "llama-2-7b-chat")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "meta-llama/Llama-2-7b-chat-hf")
 
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")

@@ -1,34 +1,19 @@
-from fastapi import FastAPI, HTTPException
-from .models import IngestRequest, QueryRequest
-from .rag import ingest_paths, answer
-import glob
+from fastapi import FastAPI
+from pydantic import BaseModel
+from .llm_client import chat  # Import the chat function from llm_client.py
 
-# Create FastAPI instance
-app = FastAPI(title="RAG API")
+app = FastAPI()
 
-# Root endpoint to return a welcome message
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the RAG API"}
+class QueryRequest(BaseModel):
+    question: str  # The user's question as input
 
-# Ingest endpoint to process document files
-@app.post("/ingest")
-def ingest(req: IngestRequest):
-    # Expand paths based on the given patterns
-    expanded = []
-    for pattern in req.paths:
-        matches = glob.glob(pattern)
-        if matches:
-            expanded.extend(matches)
-    # If no files match, return error
-    if not expanded:
-        raise HTTPException(400, "No files matched the given paths.")
-    # Call the ingest function to process the files
-    result = ingest_paths(req.tenant_id, expanded)
-    return {"ok": True, **result}
-
-# Query endpoint to process a user's question
 @app.post("/query")
-def query(req: QueryRequest):
-    # Call the answer function to get the response to the query
-    return answer(req.tenant_id, req.question)
+async def query(request: QueryRequest):
+    # Get the question from the request
+    query = request.question
+    
+    # Call the chat function (which talks to RunPod) and get the response
+    answer = chat(query)
+    
+    # Return the answer received from RunPod's model
+    return {"answer": answer.get("choices", [{}])[0].get("message", {}).get("content", "No answer")}
