@@ -15,3 +15,4 @@ ehthumbs.db
 
 # Ignore log files
 *.log
+.env
